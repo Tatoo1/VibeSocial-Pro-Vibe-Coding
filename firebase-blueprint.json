@@ -1,0 +1,177 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and subscription data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "editor", "viewer"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "ContentCalendar": {
+      "title": "ContentCalendar",
+      "description": "30-day editorial planning",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "month": { "type": "string" },
+        "year": { "type": "integer" },
+        "status": { "type": "string", "enum": ["draft", "published"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "month", "year"]
+    },
+    "SocialPost": {
+      "title": "SocialPost",
+      "description": "Generated content for specific social networks",
+      "type": "object",
+      "properties": {
+        "calendarId": { "type": "string" },
+        "network": { "type": "string", "enum": ["X", "LinkedIn", "YouTube", "TikTok", "Instagram", "Facebook"] },
+        "day": { "type": "integer" },
+        "content": { "type": "string" },
+        "title": { "type": "string" },
+        "hashtags": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["draft", "approved", "scheduled", "published"] },
+        "aiPrompts": { "type": "object" }
+      },
+      "required": ["calendarId", "network", "day", "content"]
+    },
+    "Campaign": {
+      "title": "Campaign",
+      "description": "Ad campaign management",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "platform": { "type": "string", "enum": ["Meta", "TikTok", "Google"] },
+        "budget": { "type": "number" },
+        "status": { "type": "string" },
+        "kpis": { "type": "object" }
+      },
+      "required": ["userId", "name", "platform"]
+    },
+    "Metrics": {
+      "title": "Metrics",
+      "description": "Analytics data for posts and campaigns",
+      "type": "object",
+      "properties": {
+        "referenceId": { "type": "string" },
+        "type": { "type": "string", "enum": ["post", "campaign"] },
+        "views": { "type": "integer" },
+        "reach": { "type": "integer" },
+        "likes": { "type": "integer" },
+        "shares": { "type": "integer" },
+        "ctr": { "type": "number" },
+        "roi": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["referenceId", "type"]
+    },
+    "AgentSession": {
+      "title": "AgentSession",
+      "description": "Interactions with specialized AI agents",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "agentId": { "type": "string" },
+        "agentName": { "type": "string" },
+        "prompt": { "type": "string" },
+        "response": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "agentId", "prompt", "response"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/contentCalendars/{calendarId}": {
+      "schema": "ContentCalendar",
+      "description": "Editorial calendars"
+    },
+    "/contentCalendars/{calendarId}/posts/{postId}": {
+      "schema": "SocialPost",
+      "description": "Posts within a calendar"
+    },
+    "/campaigns/{campaignId}": {
+      "schema": "Campaign",
+      "description": "Ad campaigns"
+    },
+    "/metrics/{metricId}": {
+      "schema": "Metrics",
+      "description": "Analytics records"
+    },
+    "/agentSessions/{sessionId}": {
+      "schema": "AgentSession",
+      "description": "AI agent work history"
+    },
+    "/calendarEvents/{eventId}": {
+      "schema": "CalendarEvent",
+      "description": "Editorial calendar posts"
+    },
+    "/campaigns/{campaignId}": {
+      "schema": "Campaign",
+      "description": "Marketing campaigns"
+    },
+    "/adCampaigns/{adId}": {
+      "schema": "AdCampaign",
+      "description": "Advertisement campaigns within a marketing campaign"
+    }
+  },
+  "definitions": {
+    "CalendarEvent": {
+      "title": "CalendarEvent",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "campaignId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "networkId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["draft", "scheduled", "published"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "campaignId", "title", "networkId", "date", "status"]
+    },
+    "Campaign": {
+      "title": "Campaign",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "closed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "status"]
+    },
+    "AdCampaign": {
+      "title": "AdCampaign",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "campaignId": { "type": "string" },
+        "name": { "type": "string" },
+        "platform": { "type": "string" },
+        "budget": { "type": "number" },
+        "spent": { "type": "number" },
+        "status": { "type": "string", "enum": ["Active", "Reviewing", "Paused"] },
+        "reach": { "type": "string" },
+        "leads": { "type": "number" },
+        "roas": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "campaignId", "name", "platform", "budget", "spent", "status"]
+    }
+  }
+}
